@@ -1,0 +1,18 @@
+input[type="file"] {
+    display: none;
+}
+
+#fileBtn
+{
+    width: 100%;
+}
+
+#selectedFileName
+{
+    padding-top: 8px;
+    line-height: 30px;
+    font-size: 20px;
+    font-family: Roboto;
+    color: rgb(67, 203, 142);
+    
+}

@@ -1,0 +1,77 @@
+<div class="container h-100">
+  <div class="row align-items-center h-100">
+    <div class="col-1">
+
+    </div>
+
+    <div class="col-10">
+      <div class="card mb-3 p-2 bg-dark text-white">
+        <div class="text-center">
+          <button type="button" class="btn btn-shadow btn-lg btn-outline-success text-center" (click)="toggleULFunction(ulCollapsed)"
+            [attr.aria-expanded]="!ulCollapsed" aria-controls="collapseExample">
+            <span class="fa fa-upload mr-2"></span>
+            Encrypt &amp; Upload File
+          </button>
+        </div>
+        <div id="collapseExample" [ngbCollapse]="ulCollapsed">
+          <div class="card">
+            <div class="card-body">
+              <div class="container">
+                <form>
+                  <div class="form-group row">
+                    <div class="col">
+                      <label for="file" id="fileBtn" class="btn btn-shadow btn-lg btn-outline-success">
+                        Choose File
+                        <input type="file" id="file" (change)="getFileInput($event.target.files)">
+                      </label>
+
+                    </div>
+                    <div class="col">
+                      <label id="selectedFileName">{{fileName}}</label>
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <div class="col">
+                      <button type="button" class="btn btn-shadow btn-lg btn-outline-success" (click)="startFileUpload()">
+                        <span class="fa fa-file-archive mr-2"></span>
+                        Start Encryption &amp; File Upload
+                      </button>
+                    </div>
+                  </div>
+
+
+                </form>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3 p-2 text-center bg-dark text-white">
+        <div class="text-center">
+          <button type="button" class="btn btn-shadow btn-lg btn-outline-danger" (click)="toggleDLFunction(dlCollapsed)" [attr.aria-expanded]="!dlCollapsed"
+            aria-controls="collapseExample">
+            <span class="fa fa-download mr-2"></span>
+            Fetch Encrypted File
+          </button>
+        </div>
+        <div id="collapseExample" [ngbCollapse]="dlCollapsed">
+          <div class="card">
+            <div class="card-body">
+              You can collapse this card by clicking Toggle
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-1">
+
+    </div>
+
+
+  </div>
+</div>
