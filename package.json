@@ -9,12 +9,11 @@
     "node": "9.8.0"
   },
   "scripts": {
-    "ng": "ng",
     "start": "node www/server.js",
-    "build": "ng build --aot --prod",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "postinstall": "ng build --aot -prod"
   },
   "private": true,
   "dependencies": {
