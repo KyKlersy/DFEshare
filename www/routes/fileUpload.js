@@ -16,7 +16,7 @@ router.post('/', upload.single('file') ,function(req, res, next) {
     console.log(req.file + "File.");
     console.log(Date.now());
     res.send({
-      success: true;
+      success: true
     });
   }
 });
