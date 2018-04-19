@@ -20,7 +20,7 @@
                 <form>
                   <div class="form-group row">
                     <div class="col">
-                      <label for="file" id="fileBtn" class="btn btn-shadow btn-lg btn-outline-success">
+                      <label for="file" id="fileBtn" class="btn btn-shadow btn-lg btn-outline-success fullwidth">
                         Choose File
                         <input type="file" id="file" (change)="getFileInput($event.target.files)">
                       </label>
@@ -39,12 +39,11 @@
                       </button>
                     </div>
                   </div>
-
-
                 </form>
+                <div class="row" *ngIf="showlink">
+                  <textarea id="showfilelink" class="fullwidth" data-ng-model="showfilelink" >{{showfilelink}} </textarea>
+                </div>
               </div>
-
-
             </div>
           </div>
         </div>
@@ -61,7 +60,24 @@
         <div id="collapseExample" [ngbCollapse]="dlCollapsed">
           <div class="card">
             <div class="card-body">
-              You can collapse this card by clicking Toggle
+              <div class="container">
+                <div class="row textAreaPad">
+                  <div class="col">
+                    <label>Enter the link given to you here.</label>
+                    <textarea id="decryptfilelink" class="fullwidth" [(ngModel)]="decryptfilelink"></textarea>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col">
+                    <button type="button" class="btn btn-shadow btn-lg btn-outline-danger" (click)="startFileDownload()">
+                      <span class="fas fa-unlock-alt mr-2"> </span>
+                      Start File Download &amp; Decryption
+                    </button>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
@@ -71,7 +87,5 @@
     <div class="col-1">
 
     </div>
-
-
   </div>
 </div>

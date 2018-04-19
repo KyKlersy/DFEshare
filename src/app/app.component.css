@@ -2,7 +2,7 @@ input[type="file"] {
     display: none;
 }
 
-#fileBtn
+.fullwidth
 {
     width: 100%;
 }
@@ -14,5 +14,9 @@ input[type="file"] {
     font-size: 20px;
     font-family: Roboto;
     color: rgb(67, 203, 142);
-    
+
+}
+
+.textAreaPad{
+  padding: 0.5em;
 }

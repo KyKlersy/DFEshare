@@ -1,7 +1,19 @@
-//console.log('hello from a webworker');
+
+importScripts('https://unpkg.com/promise-worker-transferable@1.0.4/dist/promise-worker.register.min.js');
+
+
+registerPromiseWorker(function(message){
+  if(message.rt === 'ef')
+  {
+    console.log(message);
+    return encryptFile(message.data);
+  }
+
+});
 
 async function encryptFile(fileSent)
 {
+  var enc = new TextEncoder();
     const rsaAlg = {
         name: "RSA-OAEP",
         hash: "SHA-256",
@@ -17,14 +29,31 @@ async function encryptFile(fileSent)
         iv: iv,
     };
 
+    //var fl = Array.from(fileSent);
+
+    //console.log("file sent: " + fileSent);
+    //console.log("file list: " + fl);
+    //console.log("file name: " + fileSent.item(0).name);
+
+    //console.log("file mime: " + fileSent.item(0).type);
+
     let rsaKP = await generateRSAkeys(rsaAlg);
     let aesKy = await generateAESkey(aesAlg);
     let aesJWKString = await exportAesKeyToJWK(aesKy);
     let rsaJWK = await exportPublicRsaKey(rsaKP);
     let filecrypted = await fileEncryptor(fileSent, aesKy, aesAlg);
-
-    let finalResults = [rsaKP, aesKy, iv, aesJWKString, rsaJWK, filecrypted];
+    let filenamecrypted = await encryptor((enc.encode(fileSent.item(0).name)), aesKy, aesAlg);
+    let filemimecrypted = await encryptor((enc.encode(fileSent.item(0).type)), aesKy, aesAlg);
+    //let finalResults = [rsaKP, aesKy, iv, aesJWKString, rsaJWK, filecrypted];
+    let finalResults = {
+      filecrypted: filecrypted,
+      filenamecrypted: filenamecrypted,
+      filemimecrypted: filemimecrypted,
+      key: aesKy
+    };
     return finalResults;
+
+
     //return filecrypted;
 }
 
@@ -74,6 +103,15 @@ async function fileread(file)
     return filedata;
 }
 
+async function encryptor(fn, aeskey, aesAlg)
+{
+  if(typeof fn != 'undefined')
+  {
+    let encrypted = crypto.subtle.encrypt(aesAlg, aeskey, fn);
+    return encrypted;
+  }
+}
+
 async function fileEncryptor(file, aeskey, aesAlg)
 {
     if(typeof file != 'undefined')
@@ -100,13 +138,13 @@ async function fileDecryptor(buf, iv, aesCryptoKey)
 
 
 
-self.addEventListener('message', function(e)
+/*self.addEventListener('message', function(e)
 {
 
     var fileSent = e.data;
 
 
-    
+
 
     encryptFile(fileSent).then((rsakey) =>{
         console.log(rsakey[2]);
@@ -122,10 +160,10 @@ self.addEventListener('message', function(e)
             fileDecryptor(rsakey[5], rsakey[2], key).then((decyrpted)=>{
                 console.log(decyrpted);
                 self.postMessage({fileDec: decyrpted});
-                
+
             })
         })
 
     })
-    
-}, false);
+
+}, false);*/

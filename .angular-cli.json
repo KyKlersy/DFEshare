@@ -21,6 +21,7 @@
         "styles.css"
       ],
       "scripts": [
+        "../node_modules/promise-worker-transferable/dist/promise-worker.register.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
