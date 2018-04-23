@@ -1,10 +1,10 @@
 var express = require('express');
 var multer  = require('multer');
 var db = require('../database');
-
+const fileSizeLimit = ( 2* 1024 * 1024 );
 var upload = multer({
     dest: './www/uploads/',
-    limits: { fileSize: 2* 1024 * 1024}
+    limits: { fileSize: fileSizeLimit} //File size limit 2MegaBytes
   }).single('file');
 
 const gcs = require('@google-cloud/storage')({
@@ -14,31 +14,35 @@ const gcs = require('@google-cloud/storage')({
 
 var router = express.Router();
 
-router.post('/', function(req, res)
+router.post('/', function(req, res, next)
 {
   var fileRG;
   upload(req, res, function(err) {
-    if(err)
+    if(!err)
     {
-      console.log("error");
-      return res.send({
-              success: false
-            });
-    }
-
-    db.saveFileUpload(req, res).then((e) =>{
-      console.log("File id returned from db: " + e.fileRG.file_id);
-      res.send({
-        success: true,
-        fileRG: e.fileRG
+      console.log("No error procede with db");
+      db.saveFileUpload(req, res, next).then((e) =>{
+        console.log("File id returned from db: " + e.fileRG.file_id);
+        res.send({
+          success: true,
+          fileRG: e.fileRG
+        });
+      }).catch(function(error){
+        console.log(error);
+        var err = "File upload error: " + error;
+        // return res.send({
+        //         success: false
+        // });
+        next(err);
       });
 
-    }).catch(function(error){
-      console.log(error);
-      return res.send({
+    }else
+    {
+      console.log("File upload error " + err);
+      res.send({
               success: false
-            });
-    });
+      });
+    }
   });
 });
 

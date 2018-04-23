@@ -9,11 +9,8 @@ const gcs = require('@google-cloud/storage')({
   credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS)
 });
 
-
-router.post('/', function(req, res){
-  console.log("Atleast we made it here");
-  console.log("req body " + req.body);
-  db.getFileById(req,res);
+router.post('/', function(req, res, next){
+    db.getFileById(req,res,next);
 });
 
 module.exports = router;

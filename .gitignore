@@ -3,6 +3,9 @@
 #secret keys
 .env
 
+#setup blocks
+config-cors.json
+
 #
 /www/uploads/*
 !/www/uploads/.gitkeep
