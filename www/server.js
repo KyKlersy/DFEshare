@@ -35,7 +35,7 @@ app.use(function(err, req, res, next) {
 //Run Cleanup script every hour, in milliseconds.
 setInterval(doClean=>{
   cleanupscript.cleanFiles();
-},60000); // Debug testing checks once a minute revert.
+},3600000); // Debug testing checks once a minute revert. 60000 reverted
 //3600000  For production use this number, check once every hour
 
 app.listen(process.env.PORT || 3000);

@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Rx';
 import * as workerPath from "file-loader?name=[name].js!../assets/File_Encrypt_Worker";
 import * as PromiseWorker from 'promise-worker-transferable';
 
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-root',
@@ -22,12 +21,10 @@ export class AppComponent
   private filesSelected : FileList;
   public _this = this;
 
-  closeResult: string;
-
   private worker = new Worker(workerPath);
 
 
-  constructor(private _RequestFileService: RequestFileService, private modalService: NgbModal) {
+  constructor(private _RequestFileService: RequestFileService) {
   }
 
 
@@ -194,26 +191,5 @@ export class AppComponent
   arrayToString(buf) {
     return String.fromCharCode.apply(null, new Uint16Array(buf));
   }
-
-  open(content) {
-    this.modalService.open(content).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return  `with: ${reason}`;
-    }
-  }
-
-
-
 
 }

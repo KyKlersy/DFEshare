@@ -6,11 +6,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { RequestFileService } from './Services/request-file.service';
 
 import { AppComponent } from './app.component';
+import { ErrorModelComponent } from './error-model/error-model.component';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ErrorModelComponent
   ],
   imports: [
     BrowserModule,
