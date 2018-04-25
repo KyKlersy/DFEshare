@@ -17,6 +17,9 @@
           <div class="card">
             <div class="card-body">
               <div class="container">
+                <div class="row">
+                  <h5>File Selected must be under 2 MegaBytes in Size.</h5>
+                </div>
                 <form>
                   <div class="form-group row">
                     <div class="col">
@@ -24,7 +27,6 @@
                         Choose File
                         <input type="file" id="file" (change)="getFileInput($event.target.files)">
                       </label>
-
                     </div>
                     <div class="col">
                       <label id="selectedFileName">{{fileName}}</label>
@@ -83,8 +85,8 @@
       </div>
 
 
-      <app-error-model></app-error-model>
-
+      <!-- <app-error-model></app-error-model> -->
+      <app-error-modal-dyn></app-error-modal-dyn>
     </div>
     <div class="col-1">
 

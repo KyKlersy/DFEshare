@@ -34,7 +34,8 @@ async function encryptFile(fileSent)
 
   var iv = crypto.getRandomValues(new Uint8Array(12));
   var ivstring = iv.toString();
-  var ivExport = ivstring.replace(/,/g,"-");
+  var ivReplace = ivstring.replace(/,/g,"-");
+  var ivExport = btoa(ivReplace);
   console.log(iv.toString());
   console.log(ivExport);
 
@@ -95,7 +96,8 @@ async function decryptFile(dataSent)
   console.log("data: " + JSON.stringify(dataSent));
   var keySent = dataSent.key;
   console.log("dataSent iv: " + dataSent.iv);
-  var iv = (dataSent.iv).split('-');
+  var decB64 = atob(dataSent.iv);
+  var iv = (decB64).split('-');
   console.log("iv string split: " + iv);
   var ivB = new Uint8Array(iv).buffer;
 

@@ -6,14 +6,15 @@ const path = require('path');
 const connectionString = process.env.DATABASE_URL;
 
 var options = {
-  promiseLib: promise
+  promiseLib: promise,
+  capSQL: true
 };
 
 var pgpromise = require('pg-promise')(options);
 
 //Dates in utc format
 pgpromise.pg.types.setTypeParser(1114, function (stringValue) {
-    return stringValue;
+    return new Date(stringValue + 'Z');
 });
 
 pgpromise.pg.defaults.ssl = true;
@@ -25,8 +26,6 @@ const gcs = require('@google-cloud/storage')({
   projectId: process.env.GOOGLE_BUCKET,
   credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS)
 });
-
-
 
 async function saveFileUpload(req, res, next)
 {
@@ -67,27 +66,25 @@ function getFileById(req, res, next)
     expires: expireTime
   };
 
-  db.one('SELECT * FROM encryptedFiles where file_id = $1', [uuid])
+  db.one('SELECT * FROM encryptedfiles where file_id = $1', [uuid])
   .then(data =>{
-    console.log(data);
-    //var timeDif = ((timeNow/ 1000.0) - new Date(data.file_timestamp));
-    var dbDate = Date.parse(data.file_timestamp);
-    var utcDate = (new Date().getTime());
-     console.log("DB date returned: " + data.file_timestamp);
-    // console.log("Local UTC time: " + utcDate);
-     console.log("DB UTC time: " + dbDate);
 
-    var timeDif = (( dbDate - utcDate )/1000.0);
+    var dbDate = new Date(data.file_timestamp);
+
+    var utcDate = new Date().getTime();
+
+    var timeDif = (( utcDate - dbDate )/1000.0); //Timestamp diference in seconds.
     console.log("Time stamp difference: " + timeDif);
 
     //Difference between timestamp of when file was saved and the time now, vs's 24hrs.
     // > than 24hrs means the file has been deleted otherwise file is still valid.
-    if(timeDif > 43200)
+    if(timeDif > 86400) //86400
     {
       console.log("Past 24hr limit file removed.");
       err = {
         accessURL: 'NFE',
-        reason: 'Past 24 Hour Limit.'
+        reason: 'Past 24 Hour Limit.',
+        etype: 'Expired File.'
       }
       next(err);
     }
@@ -109,13 +106,20 @@ function getFileById(req, res, next)
           originalName: data.original_file_name,
           originalFileMime: data.original_file_mime
         });
+
+        db.none('INSERT INTO requestedfiles( r_file_id, r_file_name, r_file_timestamp ) VALUES ($1, $2, DEFAULT)', [data.file_id, data.file_name]).catch(function(error){
+          console.log(error);
+        });
+
+
       })
     }
   }).catch(function(error){
     console.log(error);
     err = {
       accessURL: 'NFE',
-      reason: 'File no longer exists or one time download has already been claimed.'
+      reason: 'File no longer exists or one time download has already been claimed.',
+      etype: 'File not found.'
     }
     next(err);
   });
@@ -125,59 +129,109 @@ function cleanDeadFiles()
 {
   const uploadDirName = '/uploads/';
   const uploadDirPath = (path.join(__dirname + uploadDirName));
-  console.log("Now running delete check on database, expired files will be deleted from database cloud older than 24hrs."
-  + " Server local temp files will be purged.");
 
-  //console.log("Path: " + (path.join(__dirname + uploadDirName)) );
+  const colset = new pgpromise.helpers.ColumnSet(['r_file_id','r_file_name','r_file_timestamp'],{table:'requestedfiles'});
 
-  //var fn = '0a084cf13043660b8e9f097899e32c71';
-  //console.log("File to delete: " + (path.join(uploadDirPath + fn)) );
+  // console.log("Now running delete check on database, expired files will be deleted from database cloud older than 24hrs."
+  // + " Server local temp files will be purged.");
 
   //1 Hour Check to clear server local temp files.
-  db.any('SELECT (file_name) FROM encryptedFiles WHERE file_timestamp < (NOW() - \'1 hour\'::interval )').then(data =>{
-
-    for(var i = 0; i < data.length; i++)
-    {
-      fs.statSync((path.join(uploadDirPath + data[i].file_name)))
-
-      if(!err)
-      {
-        fs.unlinkSync((path.join(uploadDirPath + data[i].file_name)));
-      }
-    }
-  });
+  // db.any('SELECT (file_name) FROM encryptedfiles WHERE file_timestamp < (NOW() - \'1 hour\'::interval )').then(data =>{
+  //
+  //   for(var i = 0; i < data.length; i++)
+  //   {
+  //     if(fs.existsSync((path.join(uploadDirPath + data[i].file_name))))
+  //     {
+  //       fs.unlinkSync((path.join(uploadDirPath + data[i].file_name)));
+  //     }
+  //   }
+  // });
 
 
   //24 Hour Check deletes time expired files from db and cloud storage.
-  db.any('SELECT (file_name) FROM encryptedFiles WHERE file_timestamp < (NOW() - \'24 hour\'::interval )').then(data =>{
+  db.any('SELECT * FROM encryptedfiles WHERE encryptedfiles.file_id NOT IN (SELECT requestedfiles.r_file_id from requestedfiles) AND (encryptedfiles.file_timestamp < (NOW() - \'24 hours\'::interval)) ').then(data =>{
 
-    //console.log("Data: " + JSON.stringify(data));
-    //console.log("Data length: " + data.length);
-
+    var values = [];
     for(var i = 0; i < data.length; i++)
     {
-      console.log("row: " + data[i].file_name);
+      values.push({r_file_id: data[i].file_id, r_file_name: data[i].file_name, r_file_timestamp: data[i].file_timestamp});
+    }
 
-      gcs
-      .bucket(process.env.GOOGLE_BUCKET_NAME)
-      .file(data[i].file_name)
-      .delete()
-      .catch(err => {
-        console.error('ERROR:', err);
+    if(data.length > 0)
+    {
+      const query = pgpromise.helpers.insert( values, colset );
+
+      db.none(query).catch(error => {
+         console.log("Error inserting dead files: " + error);
+      });
+
+      //After removing from cloud, nuke from database.
+      db.none('DELETE FROM encryptedfiles WHERE file_timestamp < (NOW() - \'24 hours\'::interval )').catch(function(error){
+        console.log(error);
       });
 
     }
-  });
 
-  //After removing from cloud, nuke from database.
-  db.none('DELETE FROM encryptedFiles WHERE file_timestamp < (NOW() - \'24 hour\'::interval )').catch(function(error){
-    console.log(error);
   });
 
 }
 
+function cleanExpiredRequestedFiles()
+{
+  const uploadDirName = '/uploads/';
+  const uploadDirPath = (path.join(__dirname + uploadDirName));
+  // console.log("Now running requested file cleanup, 10 minute past expired files that were requested will be deleted from database, cloud and "
+  // + " local temp files if exists will be purged.");
+
+  //10minutes Check deletes time expired files from db and cloud storage.
+  db.any('SELECT * FROM requestedfiles WHERE r_file_timestamp < (NOW() - \'10 minutes\'::interval )').then(data =>
+  {
+
+    if(data.length < 1)
+    {
+      return;
+    }
+
+    for(var i = 0; i < data.length; i++)
+    {
+
+      gcs
+      .bucket(process.env.GOOGLE_BUCKET_NAME)
+      .file(data[i].r_file_name)
+      .delete()
+      .catch(error => {
+        console.error('Google Bucket Delete Error: ', error);
+      });
+
+
+      db.none('DELETE FROM encryptedfiles WHERE file_name = $1',[data[i].r_file_name])
+      .catch(function(error){
+        console.log("Error deleting from encryptedfiles: " + error);
+      });
+
+      //Cover base case where user may upload and request file in < 1hr, faster than normal server does local file cleanup.
+      if(fs.existsSync((path.join(uploadDirPath + data[i].r_file_name))))
+      {
+        fs.unlinkSync((path.join(uploadDirPath + data[i].r_file_name)));
+      }
+    }
+
+    //changed to 1 from 10 minutes
+    db.none('DELETE FROM requestedfiles WHERE r_file_timestamp < (NOW() - \'10 minutes\'::interval)').catch(function(error){
+        console.log("Error deleting from requested files: " + error);
+    });
+
+  }).catch(function(error){
+      console.log("Selection from request file error: " + error);
+  });
+
+  return;
+}
+
+
 module.exports = {
   saveFileUpload: saveFileUpload,
   getFileById: getFileById,
-  cleanDeadFiles: cleanDeadFiles
+  cleanDeadFiles: cleanDeadFiles,
+  cleanExpiredRequestedFiles: cleanExpiredRequestedFiles
 };

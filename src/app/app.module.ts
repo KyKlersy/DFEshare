@@ -3,16 +3,23 @@ import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { RequestFileService } from './Services/request-file.service';
 
+/* Service Imports */
+import { RequestFileService } from '@Services/FileRequestService/request-file.service';
+import { ErrorMsgService } from '@Services/ErrorMsgService/error-msg.service';
+
+/* Component Imports */
 import { AppComponent } from './app.component';
-import { ErrorModelComponent } from './error-model/error-model.component';
+//import { ErrorModelComponent } from './error-model/error-model.component';
+import { ErrorModalDynComponent, NgbdModalContent} from './error-modal-dyn/error-modal-dyn.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    ErrorModelComponent
+    //ErrorModelComponent,
+    ErrorModalDynComponent,
+    NgbdModalContent
   ],
   imports: [
     BrowserModule,
@@ -21,7 +28,8 @@ import { ErrorModelComponent } from './error-model/error-model.component';
     HttpClientModule,
     NgbModule.forRoot()
   ],
-  providers: [RequestFileService],
+  entryComponents: [NgbdModalContent],
+  providers: [RequestFileService, ErrorMsgService],
   bootstrap: [AppComponent]
 })
 

@@ -40,7 +40,9 @@ router.post('/', function(req, res, next)
     {
       console.log("File upload error " + err);
       res.send({
-              success: false
+              accessURL: 'NFE',
+              reason: 'File to large or network error.',
+              etype: 'File Upload Error'
       });
     }
   });

@@ -1,7 +1,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
+    "baseUrl": "src",
+    "outDir": "dist/out-tsc",
+    "paths": {
+      "@Services/*": ["app/Services/*"]
+    },
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",

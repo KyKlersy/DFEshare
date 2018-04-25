@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
-import { RequestFileService } from './Services/request-file.service';
+import { Component, Output, EventEmitter, } from '@angular/core';
+import { RequestFileService } from '@Services/FileRequestService/request-file.service';
 import { Observable } from 'rxjs/Rx';
 import * as workerPath from "file-loader?name=[name].js!../assets/File_Encrypt_Worker";
 import * as PromiseWorker from 'promise-worker-transferable';
 
+import { ErrorMsgService } from '@Services/ErrorMsgService/error-msg.service';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,7 @@ export class AppComponent
   private worker = new Worker(workerPath);
 
 
-  constructor(private _RequestFileService: RequestFileService) {
+  constructor(private _RequestFileService: RequestFileService, private _errorMsgData : ErrorMsgService ) {
   }
 
 
@@ -64,21 +65,13 @@ export class AppComponent
     this.filesSelected = files;
   }
 
-  uploadFile(e)
-  {
-    this._RequestFileService.UploadFile('/uploadfile', e).subscribe(
-      res => {
-        console.log(res);
-      },
-      err => {
-        console.log("Err" + err);
-      }
-    );
-  }
-
   startFileUpload()
   {
-
+    if( this.filesSelected.item(0).size > 2097152 )
+    {
+      this._errorMsgData.sendErrorUpdate({etype: 'File To Big ', reason: 'File Size must be below 2MB.'});
+      return null;
+    }
     var promiseworker = new PromiseWorker(this.worker);
     console.log("File selected: " + this.filesSelected.item(0).name);
 
@@ -116,6 +109,14 @@ export class AppComponent
 
       this._RequestFileService.UploadFile('uploadfile', formdata).subscribe(
           data => {
+
+            if( data.accessURL === 'NFE' )
+            {
+              this._errorMsgData.sendErrorUpdate(data);
+              this.showfilelink = "";
+              return null;
+            }
+
             console.log(data)
             console.log("e.key");
             console.log(e.key);
@@ -146,8 +147,10 @@ export class AppComponent
 
           if(data.accessURL === 'NFE')
           {
+            this._errorMsgData.sendErrorUpdate(data);
+
             console.log("Bad Data Returned");
-            this.decryptfilelink = data.reason;
+            this.decryptfilelink = "";
             return null;
           }
 
@@ -174,8 +177,6 @@ export class AppComponent
               document.body.appendChild(alink);
               alink.click();
               document.body.removeChild(alink);
-
-              /* Todo make api call confirming dl */
 
             }).catch(function(error){
               console.log(error);
