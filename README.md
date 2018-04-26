@@ -55,9 +55,11 @@ Not included in this git is the cors-config file used.
 ### Note this project makes use of .env to hide keys for local developement
 Because of this, these keys will not work unless they are entered as config vars on heroku.
 
-This app uses the following Key / Pairs for local developement you should create a .env file in the root of the project folder making sure to add this to git ignore. DO NOT EVER COMMIT KEYS.
+This app uses the following Key / Pairs for local developement you should create a .env file in the root of the project folder making sure to add this to git ignore. 
 
-DATABASE_URL can be founder under herokus dashboard for the addon database, by clicking on it and going to datastores -> settings -> view credentials copy the connection string and paste it into your .env file.
+# DO NOT EVER COMMIT KEYS.
+
+DATABASE_URL can be found under herokus dashboard for the addon database, by clicking on it and going to datastores -> settings -> view credentials copy the connection string and paste it into your .env file.
 
 
 ```
