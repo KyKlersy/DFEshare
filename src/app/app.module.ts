@@ -10,14 +10,12 @@ import { ErrorMsgService } from '@Services/ErrorMsgService/error-msg.service';
 
 /* Component Imports */
 import { AppComponent } from './app.component';
-//import { ErrorModelComponent } from './error-model/error-model.component';
 import { ErrorModalDynComponent, NgbdModalContent} from './error-modal-dyn/error-modal-dyn.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    //ErrorModelComponent,
     ErrorModalDynComponent,
     NgbdModalContent
   ],

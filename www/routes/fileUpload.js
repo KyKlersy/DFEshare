@@ -30,9 +30,6 @@ router.post('/', function(req, res, next)
       }).catch(function(error){
         console.log(error);
         var err = "File upload error: " + error;
-        // return res.send({
-        //         success: false
-        // });
         next(err);
       });
 

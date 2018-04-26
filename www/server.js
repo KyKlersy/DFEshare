@@ -14,7 +14,8 @@ const downloadFile = require(path.join(__dirname, '/routes/getFileDownload'));
 const cleanupscript = require(path.join(__dirname, '/cleaner'));
 
 const app = express();
-app.use(helmet());
+app.use(helmet())
+
 app.use(cors());
 
 app.enable('trust proxy'); //Behind Heroku, need to set this to trust as they act as a reverse prox to this app.

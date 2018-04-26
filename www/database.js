@@ -32,12 +32,12 @@ async function saveFileUpload(req, res, next)
   var fn =  req.file.filename;
   var ofn = req.body.originalfilename;
   var ofm = req.body.originalfilemime;
-  console.log("FN: ");
-  console.log(fn);
-  console.log(" OFN: ");
-  console.log(ofn);
-  console.log(" OFM: ");
-  console.log(ofm);
+  // console.log("FN: ");
+  // console.log(fn);
+  // console.log(" OFN: ");
+  // console.log(ofn);
+  // console.log(" OFM: ");
+  // console.log(ofm);
 
   let fileRG = await db.one('INSERT INTO encryptedfiles(file_id, file_timestamp, file_name, original_file_name, original_file_mime) VALUES(DEFAULT, DEFAULT, $1, $2, $3) RETURNING file_id', [fn, ofn, ofm]);
   let googleUpload = await gcs.bucket(process.env.GOOGLE_BUCKET_NAME).upload(req.file.path);
