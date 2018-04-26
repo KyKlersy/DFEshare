@@ -4,7 +4,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Third Party Requirements
 1.Heroku
+
 2.Heroku Managed Postgresql
+
 3.Google Cloud Services
 
 ***
