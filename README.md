@@ -38,7 +38,7 @@ After confirming that the addon is working run in your shell of choice, making s
  You will need a [Google cloud service account](https://cloud.google.com/)
   Google provides a free 1 year no charge account to their services and 300$ credit. There is no catch and no billing when the trial ends just that it will no longer work unless you pay to upgrade.
   
-  Once you have a google cloud account you will need to create a project and a bucket, make note of the project of the project-id as you will need this later. Name the bucket how ever you like. Once those steps are done you will need to create an iam service account so that heroku will be able to access this bucket this can be found under the IAM & Admin. The service account should be created for server to server, with read/write/delete access to the bucket you created. Once done you need to export the key it generates, save this somewhere safe.
+  Once you have a google cloud account you will need to create a project and a bucket, make note of the project-id as you will need this later. Name the bucket how ever you like. Once those steps are done you will need to create an iam service account so that heroku will be able to access this bucket this can be found under the IAM & Admin. The service account should be created for server to server, with read/write/delete access to the bucket you created. Once done you need to export the key it generates, save this somewhere safe.
   
 At this point you will need to download and install googles gsutil command line tools, you will need to set up cors on your bucket so that users using the app with the server generating time limited links will be able to download their encrypted files.
 
