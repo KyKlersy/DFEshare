@@ -57,7 +57,7 @@ Because of this, these keys will not work unless they are entered as config vars
 
 This app uses the following Key / Pairs for local developement you should create a .env file in the root of the project folder making sure to add this to git ignore. 
 
-# DO NOT EVER COMMIT KEYS.
+#### DO NOT EVER COMMIT KEYS.
 
 DATABASE_URL can be found under herokus dashboard for the addon database, by clicking on it and going to datastores -> settings -> view credentials copy the connection string and paste it into your .env file.
 
