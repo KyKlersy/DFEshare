@@ -17,6 +17,7 @@ This project used yarn, but it might work with npm no guarantee.
 
 ## Setup
 Clone Project,
+
   Run npm install / yarn install to get dependancies
 
 ## Setup - Heroku
