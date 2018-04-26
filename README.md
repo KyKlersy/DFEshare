@@ -1,3 +1,16 @@
+# Purpose
+As a final project for computer networks, the goal was to build an application that mirrored the abilities of sites such as [Firefox Send](https://send.firefox.com/) and [MegaNZ](https://mega.nz/). To build an app that enabled secure sharing of files by way of confidentiality, files are encrypted client side using AES-GCM 256 through Webcrypto api. This is accomplished in a seperate thread using a javascript webworker so as to not tie up the front end ui. The file is encrypted using a random generated IV of 16 bits so as to ensure the same file encrypted twice will never produce the same cipherblock. The files original name and file mime type are also encrypted. These three chunks are then uploaded to the server where the file is then passed for storage into googles cloud storage and the other two are stored in the sites database. The client then receives back from the server a unique uuid for the file that is then used in generating a decryption link in the form of 
+
+[file uuid][Base64'd IV][AES-256 key]
+
+On client request for decryption the opposite transaction occurs, sending the server only the file uuid, the server returns the original encrypted file name and mime from the database and then generates a limited time link for download access to the encrypted file. The client using this information and the other two pieces of the link then decrypts and reassembles the original file before offering up to save it.
+
+This project made use of Webcrypto Api, HTML 5, Javascript Webworkers, Angular 4-5, NodeJS and Postgresql.
+
+It should be noted that there is only **confidentiality** here in that the server will never know the original secret because the key is never passed to the server. The security in this method is only as good as how the link is shared since there is no prekey sharing and the recipent is not known ahead of time such that asymetric keys can be used.
+
+It should also be noted that encryption is not my background and thus errors may have been introduced into the system by my part. Assuming the programmer [I] didnt bungle something, you are still having to put trust into javascript based encryption and the rest of the chain.
+
 # Drop File Encrypted share
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.3.
