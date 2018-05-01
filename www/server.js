@@ -6,18 +6,17 @@ const cors = require('cors');
 const RateLimit  = require('express-rate-limit');
 const http = require('http');
 const path = require('path');
+
+/* Load routing paths for rest api */
 const uploadFile = require(path.join(__dirname, '/routes/fileUpload'));
 const downloadFile = require(path.join(__dirname, '/routes/getFileDownload'));
 
-// const bucketName = process.env.GOOGLE_BUCKET_NAME;
-// const allowBucket = ' https://storage.googleapis.com/' + bucketName +'/*';
+/* Load cleanup script used to handle dead / claimed files. */
 const cleanupscript = require(path.join(__dirname, '/cleaner'));
 
 const app = express();
-app.use(helmet())
-
+app.use(helmet());
 app.use(cors());
-
 app.enable('trust proxy'); //Behind Heroku, need to set this to trust as they act as a reverse prox to this app.
 
 var limiter = new RateLimit({
@@ -29,15 +28,17 @@ var limiter = new RateLimit({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, '../dist'))); //No rate limit on static files served.
 
-app.use('/uploadfile', limiter ,uploadFile);
-app.use('/downloadfile', limiter ,downloadFile);
+app.use('/uploadfile', limiter ,uploadFile); //Rate limit this route.
+app.use('/downloadfile', limiter ,downloadFile); //Rate limit this route.
 
+/* Redirect any request not to a designated route to here and return them the web app */
 app.get('*', (req, res, next) => {
   res.sendFile(path.join(__dirname, '/dist/index.html'));
 });
 
+/* General route catch for errors */
 app.use(function(err, req, res, next) {
     console.log("General Error Catcher " + JSON.stringify(err));
     res.send(err);

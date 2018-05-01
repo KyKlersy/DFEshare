@@ -32,12 +32,6 @@ async function saveFileUpload(req, res, next)
   var fn =  req.file.filename;
   var ofn = req.body.originalfilename;
   var ofm = req.body.originalfilemime;
-  // console.log("FN: ");
-  // console.log(fn);
-  // console.log(" OFN: ");
-  // console.log(ofn);
-  // console.log(" OFM: ");
-  // console.log(ofm);
 
   let fileRG = await db.one('INSERT INTO encryptedfiles(file_id, file_timestamp, file_name, original_file_name, original_file_mime) VALUES(DEFAULT, DEFAULT, $1, $2, $3) RETURNING file_id', [fn, ofn, ofm]);
   let googleUpload = await gcs.bucket(process.env.GOOGLE_BUCKET_NAME).upload(req.file.path);
@@ -58,8 +52,7 @@ function getFileById(req, res, next)
   var uuid = req.body.fileid;
   var err;
   console.log("uuid" + uuid);
-  //expireTime.setHours(timeNow.getHours() + 1);
-  expireTime.setMinutes(timeNow.getMinutes() + 1); //Testing timestamp time out, revert this back to comment above for production.
+  expireTime.setMinutes(timeNow.getMinutes() + 5);
   console.log("exp time " + expireTime);
   var options = {
     action: 'read',
@@ -90,7 +83,7 @@ function getFileById(req, res, next)
     }
     else
     {
-      //console.log("original name in uint8 " + new Uint8Array(data.original_file_name));
+
       gcs
       .bucket(process.env.GOOGLE_BUCKET_NAME)
       .file(data.file_name)
@@ -99,7 +92,8 @@ function getFileById(req, res, next)
       {
         const url = results[0];
 
-        //User is sent back download link one time use and nonce key. ON user download completuion key is sent back item is deleted.
+        //User is sent back download link time limited 5 minutes. It is then marked as claimed and moved to the requestedfiles table.
+        //After 10 minutes the file is then deleted from both google cloud and the database.
 
         res.send({
           accessURL: url,
@@ -110,7 +104,6 @@ function getFileById(req, res, next)
         db.none('INSERT INTO requestedfiles( r_file_id, r_file_name, r_file_timestamp ) VALUES ($1, $2, DEFAULT)', [data.file_id, data.file_name]).catch(function(error){
           console.log(error);
         });
-
 
       })
     }
@@ -135,7 +128,8 @@ function cleanDeadFiles()
   // console.log("Now running delete check on database, expired files will be deleted from database cloud older than 24hrs."
   // + " Server local temp files will be purged.");
 
-  //1 Hour Check to clear server local temp files.
+  //1 Hour Check to clear server local temp files uncomment this block if running locally as its not needed on heroku.
+
   // db.any('SELECT (file_name) FROM encryptedfiles WHERE file_timestamp < (NOW() - \'1 hour\'::interval )').then(data =>{
   //
   //   for(var i = 0; i < data.length; i++)

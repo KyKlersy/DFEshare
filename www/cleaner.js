@@ -1,6 +1,6 @@
 const path = require('path');
 const database = require(path.join(__dirname, 'database'));
-
+/* Hooking class for calling functions between server and database */
 function cleanFiles()
 {
   database.cleanDeadFiles();

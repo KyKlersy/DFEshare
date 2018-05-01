@@ -7,11 +7,6 @@ var upload = multer({
     limits: { fileSize: fileSizeLimit} //File size limit 2MegaBytes
   }).single('file');
 
-const gcs = require('@google-cloud/storage')({
-  projectId: process.env.GOOGLE_BUCKET,
-  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS)
-});
-
 var router = express.Router();
 
 router.post('/', function(req, res, next)
