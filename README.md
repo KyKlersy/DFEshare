@@ -28,6 +28,8 @@ Assuming the above requirements, this project makes use of these services, no gu
 You will need a heroku account. A google cloud services account. Already installed NodeJS > 9.6, Angular CLI, Yarn package manager.
 This project used yarn, but it might work with npm no guarantee.
 
+[Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) Is also needed before preceding.
+
 ## Setup
 Clone Project,
 
