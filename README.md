@@ -25,15 +25,15 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 ***
 ## Pre-Setup
 Assuming the above requirements, this project makes use of these services, no guarantee is made for other setups.
-You will need a heroku account. A google cloud services account. Already installed NodeJS > 9.6, Angular CLI, Yarn package manager.
-This project used yarn, but it might work with npm no guarantee.
+You will need a heroku account. A google cloud services account. Already installed NodeJS > 9.6, Angular CLI, NPM.
+This project was started with yarn, has since been deyarned and now uses npm.
 
 [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) Is also needed before preceding.
 
 ## Setup
 Clone Project,
 
-  Run npm install / yarn install to get dependencies
+  Run npm install to get dependencies
 
 ## Setup - Heroku
 Run the following command in your shell of choice in the cloned project directory to create and attach an empty heroku project.
@@ -101,9 +101,9 @@ Will start the build process.
 ## ((Optionally)) Running Local
 
 
-```yarn postinstall``` Will build and compile the app.
+```npm run postinstall``` Will build and compile the app.
 
 
-```yarn start``` will run the local app, this still assumes you setup correctly the .env file.
+```npm run start``` will run the local app on localhost port 3000, this still assumes you setup correctly the .env file.
 
 
